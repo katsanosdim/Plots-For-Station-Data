@@ -8,8 +8,8 @@ import io
 from datetime import datetime
 
 # Configure the app
-st.set_page_config(page_title="Climate Stripes Generator", page_icon="🌍", layout="wide")
-st.title(":earth_africa: Climate Stripes Generator")
+st.set_page_config(page_title="Plots Generator", page_icon="🌍", layout="wide")
+st.title(":earth_africa: Plots Generator")
 st.markdown("Make climate stripes from temperature data. Created by **Dimitris Katsanos**")
 
 # Sidebar with controls
@@ -173,3 +173,4 @@ else:
     - `Year`: The year of the temperature measurement
     - `Temperature`: The temperature anomaly value (in °C)
     """)
+
