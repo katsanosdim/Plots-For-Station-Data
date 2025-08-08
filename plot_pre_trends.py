@@ -106,7 +106,7 @@ if uploaded_file is not None:
         # Add vertical colorbar
         sm = ScalarMappable(norm=norm, cmap=cmap)
         cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.03, pad=0.02)
-        cbar.set_label(f"{selected_column} Anomaly", fontsize=12)
+        cbar.set_label(f"{selected_column} Anomaly [mm]", fontsize=12)
 
         st.pyplot(fig)
 
@@ -150,3 +150,4 @@ else:
     - `Year`: The year of the measurement  
     - At least **one or more dataset columns** (e.g., EOBS, ERA5, GPCC)  
     """)
+
