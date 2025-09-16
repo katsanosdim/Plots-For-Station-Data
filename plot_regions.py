@@ -54,7 +54,7 @@ scale_factor = st.sidebar.number_input("Scale Factor", value=40.0, step=1.0)
 add_significance = st.sidebar.checkbox("Add statistical significance markers", value=True)
 
 # --- Main App ---
-st.title("NetCDF Map Visualizer for Greece")
+st.title(":earth_africa: NetCDF Map Visualizer for Greece")
 st.markdown("Make maps for Precipitation Trends etc. Created by **Dimitris Katsanos**")
 
 if uploaded_file is not None:
@@ -196,3 +196,4 @@ st.sidebar.info(
     """
 
 )
+
