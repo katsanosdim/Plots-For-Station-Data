@@ -55,6 +55,7 @@ add_significance = st.sidebar.checkbox("Add statistical significance markers", v
 
 # --- Main App ---
 st.title("NetCDF Map Visualizer for Greece")
+st.markdown("Make maps for Precipitation Trends etc. Created by **Dimitris Katsanos**")
 
 if uploaded_file is not None:
     try:
@@ -193,4 +194,5 @@ st.sidebar.info(
     3. Make sure to include all related files (.shx, .dbf, etc.)
     4. The app will automatically look for shapefiles in the 'shapefiles' folder
     """
+
 )
