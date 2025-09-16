@@ -22,6 +22,13 @@ data_var_options = ["tp", "rr", "precipitation", "precipitation_days_index_per_t
 data_variable = st.sidebar.selectbox("Data Variable", data_var_options, index=0)
 p_value_variable = st.sidebar.selectbox("P-value Variable", ["p_value"], index=0)
 
+# Coordinate naming convention
+coord_naming = st.sidebar.selectbox(
+    "Coordinate Naming Convention",
+    ["latitude/longitude", "lat/lon"],
+    index=0
+)
+
 # Color settings
 vmin = st.sidebar.number_input("Colorbar Min", value=-20.0, step=1.0)
 vmax = st.sidebar.number_input("Colorbar Max", value=20.0, step=1.0)
@@ -66,11 +73,32 @@ if uploaded_file is not None:
         st.subheader("Dataset Information")
         st.write(f"Variables available: {list(data.data_vars.keys())}")
         st.write(f"Coordinates: {list(data.coords.keys())}")
+
+        # Determine coordinate names based on user selection
+        if coord_naming == "latitude/longitude":
+            lat_name, lon_name = "latitude", "longitude"
+        else:
+            lat_name, lon_name = "lat", "lon"
+        
+        # Check if the selected coordinate names exist in the dataset
+        if lat_name not in data.coords or lon_name not in data.coords:
+            st.error(f"Coordinates '{lat_name}' and/or '{lon_name}' not found in dataset.")
+            st.write(f"Available coordinates: {list(data.coords.keys())}")
+            st.info("Try changing the 'Coordinate Naming Convention' option.")
+            st.stop()
         
         # Subset the data for the specified area
+        #subset = data.where(
+        #    (data.latitude >= lat_min) & (data.latitude <= lat_max) &
+        #    (data.longitude >= lon_min) & (data.longitude <= lon_max),
+        #    drop=True
+        #)
+
+
+         # Subset the data for the specified area
         subset = data.where(
-            (data.latitude >= lat_min) & (data.latitude <= lat_max) &
-            (data.longitude >= lon_min) & (data.longitude <= lon_max),
+            (data[lat_name] >= lat_min) & (data[lat_name] <= lat_max) &
+            (data[lon_name] >= lon_min) & (data[lon_name] <= lon_max),
             drop=True
         )
         
@@ -88,8 +116,10 @@ if uploaded_file is not None:
             st.stop()
             
         # Create 2D meshgrid for latitudes and longitudes
-        lat = subset['latitude'].values
-        lon = subset['longitude'].values
+        #lat = subset['latitude'].values
+        #lon = subset['longitude'].values
+        lat = subset[lat_name].values
+        lon = subset[lon_name].values
         lon_grid, lat_grid = np.meshgrid(lon, lat)
         
         # Create a map projection
@@ -196,5 +226,6 @@ st.sidebar.info(
     """
 
 )
+
 
 
