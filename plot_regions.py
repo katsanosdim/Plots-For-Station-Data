@@ -62,7 +62,7 @@ add_significance = st.sidebar.checkbox("Add statistical significance markers", v
 
 # --- Main App ---
 st.title(":earth_africa: NetCDF Visualizer for Greece")
-st.markdown("Make maps for Precipitation Trends etc. Created by **Dimitris Katsanos**")
+st.markdown("Application to make maps for Precipitation Trends etc. Created by **Dimitris Katsanos**")
 
 if uploaded_file is not None:
     try:
@@ -226,6 +226,7 @@ st.sidebar.info(
     """
 
 )
+
 
 
 
