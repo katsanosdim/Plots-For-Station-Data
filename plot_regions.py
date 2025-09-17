@@ -71,8 +71,8 @@ if uploaded_file is not None:
         
         # Display dataset info
         st.subheader("Dataset Information")
-        st.write(f"Variables available: {list(data.data_vars.keys())}")
-        st.write(f"Coordinates: {list(data.coords.keys())}")
+        st.write(f"Variables available: {list(data.data_vars.keys())}, Coordinates: {list(data.coords.keys())}")
+       # st.write(f"Coordinates: {list(data.coords.keys())}")
 
         # Determine coordinate names based on user selection
         if coord_naming == "latitude/longitude":
@@ -226,6 +226,7 @@ st.sidebar.info(
     """
 
 )
+
 
 
 
