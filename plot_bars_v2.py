@@ -150,7 +150,7 @@ if uploaded_file is not None:
         plt.savefig(buf, format=file_format.lower(), dpi=dpi, bbox_inches='tight')
         buf.seek(0)
         #filename = f"{custom_filename}_{parameter}_{min_year}-{max_year}.{file_format.lower()}"
-        filename = f"{custom_filename}.{file_format.lower()}"
+        filename = f"{custom_filename}_{parameter}.{file_format.lower()}"
         
         st.download_button(
             label=f"Download Your Image ({file_format})",
