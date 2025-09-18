@@ -123,7 +123,7 @@ if uploaded_file is not None:
                 ax.plot(df['Year'], p(df['Year']),
                         color=trend_color, linestyle=trend_style, linewidth=trend_width)
 
-            ax.set_ylabel("Anomaly")
+           # ax.set_ylabel("Anomaly")
             ax.axhline(0, color="black", linewidth=1)
 
         plt.title(f"{custom_title}: {parameter} ({min_year}-{max_year})", fontsize=16)
@@ -158,3 +158,4 @@ else:
     3. Customize visualization, color map, and trendline.  
     4. Save the figure in PNG, SVG, or PDF.  
     """)
+
