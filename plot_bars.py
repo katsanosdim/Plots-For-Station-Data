@@ -126,7 +126,7 @@ if uploaded_file is not None:
            # ax.set_ylabel("Anomaly")
             ax.axhline(0, color="black", linewidth=1)
 
-        plt.title(f"{custom_title}: {parameter} ({min_year}-{max_year})", fontsize=16)
+        plt.title(f"{custom_title} {parameter} ({min_year}-{max_year})", fontsize=16)
 
         sm = ScalarMappable(norm=norm, cmap=cmap)
         cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.03, pad=0.02)
@@ -158,6 +158,7 @@ else:
     3. Customize visualization, color map, and trendline.  
     4. Save the figure in PNG, SVG, or PDF.  
     """)
+
 
 
 
