@@ -36,8 +36,8 @@ with st.sidebar:
     custom_title = st.text_input("Custom Title", value="Data - Area Sum Precipitation % Anomaly for")
     set_color_range = st.checkbox("Set Colorbar Range")
     if set_color_range:
-        color_min = st.number_input("Colorbar Min", value=-100.0, step=10)
-        color_max = st.number_input("Colorbar Max", value=100.0, step=10)
+        color_min = st.number_input("Colorbar Min", value=-100.0, step=10.0)
+        color_max = st.number_input("Colorbar Max", value=100.0, step=10.0)
 
     st.header("Trendline (Bars only)")
     add_trendline = st.checkbox("Add Trendline", value=True)
