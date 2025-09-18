@@ -27,7 +27,7 @@ with st.sidebar:
     year_step = st.slider("Year Label Step", 1, 20, 5, help="Show every Nth year")
 
     st.header("Title & Colorbar")
-    custom_title = st.text_input("Custom Title", value="NOA/IERSD - Thisseio Station")
+    custom_title = st.text_input("Custom Title", value="Data Area Sum Precipitation % Anomaly for")
     set_color_range = st.checkbox("Set Colorbar Range")
     if set_color_range:
         color_min = st.number_input("Colorbar Min", value=-2.0, step=0.5)
