@@ -87,13 +87,16 @@ if uploaded_file is not None:
         mean_value = df[parameter].mean()
         df['Anomaly'] = df[parameter] - mean_value
 
-        # 🔹 Handle color limits (symmetrical if Bars selected)
-        if plot_type == "Bars":
-            max_abs = max(abs(df['Anomaly'].min()), abs(df['Anomaly'].max()))
-            vmin, vmax = -max_abs, max_abs
+        # 🔹 Handle color limits
+        if set_color_range:
+            vmin, vmax = color_min, color_max
         else:
-            vmin = color_min if set_color_range else df['Anomaly'].min()
-            vmax = color_max if set_color_range else df['Anomaly'].max()
+            if plot_type == "Bars":
+                max_abs = max(abs(df['Anomaly'].min()), abs(df['Anomaly'].max()))
+                vmin, vmax = -max_abs, max_abs
+            else:
+                vmin = df['Anomaly'].min()
+                vmax = df['Anomaly'].max()
 
         norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
         cmap = plt.get_cmap(colormap)
@@ -119,7 +122,7 @@ if uploaded_file is not None:
             colors = [cmap(norm(val)) for val in df['Anomaly']]
             ax.bar(df['Year'], df['Anomaly'], color=colors, width=bar_width, edgecolor="black")
 
-            # 🔹 Make y-axis symmetrical around zero
+            # 🔹 Make y-axis follow vmin/vmax
             ax.set_ylim(vmin, vmax)
             ax.axhline(0, color="black", linewidth=1)
 
@@ -135,7 +138,7 @@ if uploaded_file is not None:
 
         plt.title(f"{custom_title} {parameter} ({min_year}-{max_year})", fontsize=16)
 
-        # Colorbar (follows symmetrical limits if Bars)
+        # Colorbar
         sm = ScalarMappable(norm=norm, cmap=cmap)
         cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.03, pad=0.02)
         cbar.set_label("% Anomaly", fontsize=12)
