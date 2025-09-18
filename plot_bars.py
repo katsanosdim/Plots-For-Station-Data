@@ -33,7 +33,7 @@ with st.sidebar:
     year_step = st.slider("Year Label Step", 1, 20, 5)
 
     st.header("Colorbar & Title")
-    custom_title = st.text_input("Custom Title", value="NOA/IERSD - Thisseio Station")
+    custom_title = st.text_input("Custom Title", value="ERA5 Land Area Sum Precipitation % Anomaly")
     set_color_range = st.checkbox("Set Colorbar Range")
     if set_color_range:
         color_min = st.number_input("Colorbar Min", value=-2.0, step=0.5)
@@ -158,5 +158,6 @@ else:
     3. Customize visualization, color map, and trendline.  
     4. Save the figure in PNG, SVG, or PDF.  
     """)
+
 
 
