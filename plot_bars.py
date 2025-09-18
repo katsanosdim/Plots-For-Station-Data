@@ -130,7 +130,7 @@ if uploaded_file is not None:
 
         sm = ScalarMappable(norm=norm, cmap=cmap)
         cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.03, pad=0.02)
-        cbar.set_label("Anomaly", fontsize=12)
+        cbar.set_label("% Anomaly", fontsize=12)
 
         st.pyplot(fig)
 
@@ -158,4 +158,5 @@ else:
     3. Customize visualization, color map, and trendline.  
     4. Save the figure in PNG, SVG, or PDF.  
     """)
+
 
