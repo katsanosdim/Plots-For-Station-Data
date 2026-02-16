@@ -33,7 +33,7 @@ with st.sidebar:
     year_step = st.slider("Year Label Step", 1, 20, 5)
 
     st.header("Colorbar & Title")
-    custom_title = st.text_input("Custom Title", value="Data - Area Sum Precipitation % Anomaly for")
+    custom_title = st.text_input("Custom Title", value="- Anomaly for")
     set_color_range = st.checkbox("Set Colorbar Range")
     if set_color_range:
         color_min = st.number_input("Colorbar Min", value=-100.0, step=10.0)
@@ -141,7 +141,7 @@ if uploaded_file is not None:
         # Colorbar
         sm = ScalarMappable(norm=norm, cmap=cmap)
         cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.03, pad=0.02)
-        cbar.set_label("% Anomaly", fontsize=12)
+        cbar.set_label("Anomaly", fontsize=12)
 
         st.pyplot(fig)
 
