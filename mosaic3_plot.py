@@ -185,7 +185,7 @@ if uploaded_file:
         cmap = plt.get_cmap(colormap)
 
         n_years = len(df)
-        fig_width = max(12, n_years * 0.35)
+        fig_width = max(12, n_years * 0.25)
         fig_height = 8
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
