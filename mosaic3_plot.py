@@ -185,7 +185,7 @@ if uploaded_file:
         cmap = plt.get_cmap(colormap)
 
         n_years = len(df)
-        fig_width = max(12, n_years * 0.25)
+        fig_width = max(12, n_years * 0.35)
         fig_height = 8
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
@@ -209,13 +209,13 @@ if uploaded_file:
             ax.set_xticklabels(
                 df["Year"][::year_step],
                 rotation=90,
-                fontsize=12
+                fontsize=14
             )
         else:
             ax.set_xticklabels([])
 
         ax.set_yticks(np.arange(len(month_cols)))
-        ax.set_yticklabels(month_cols, fontsize=14)
+        ax.set_yticklabels(month_cols, fontsize=16)
 
         ax.set_xlabel("Year", fontsize=16)
         ax.set_ylabel("Month / Season", fontsize=16)
@@ -224,7 +224,7 @@ if uploaded_file:
         cbar.set_label("Anomaly", fontsize=14)
         cbar.ax.tick_params(labelsize=12)
 
-        plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=18)
+        plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=20)
 
         st.pyplot(fig)
 
