@@ -4,15 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.cm import ScalarMappable
-import plotly.express as px
 import io
 
 # -------------------------------------------------
 # PAGE CONFIG
 # -------------------------------------------------
-st.set_page_config(page_title="Advanced Climate Plots", page_icon="🌍", layout="wide")
-st.title("🌍 Advanced Climate Visualisation App")
-st.markdown("Stripes • Bars • Mosaic • Interactive • Seasonal")
+st.set_page_config(page_title="Climate Plots", page_icon="🌍", layout="wide")
+st.title("🌍 Climate Visualisation App")
+st.markdown("Stripes • Bars • Mosaic • Seasonal")
 
 # -------------------------------------------------
 # SIDEBAR
@@ -23,13 +22,13 @@ with st.sidebar:
     uploaded_file = st.file_uploader(
         "Upload CSV",
         type=["csv"],
-        help="For Mosaic: Year, Jan–Dec columns"
+        help="For Mosaic: Year + 12 monthly columns (Jan–Dec)"
     )
 
     st.header("Plot Type")
     plot_type = st.radio(
         "Choose Plot",
-        ["Stripes", "Bars", "Mosaic", "Interactive Mosaic", "Seasonal Mosaic"]
+        ["Stripes", "Bars", "Mosaic", "Seasonal Mosaic"]
     )
 
     st.header("Color Settings")
@@ -57,6 +56,7 @@ with st.sidebar:
     dpi = st.slider("DPI", 100, 600, 300)
     file_format = st.selectbox("Format", ["PNG", "SVG", "PDF"])
 
+
 # -------------------------------------------------
 # MAIN
 # -------------------------------------------------
@@ -69,12 +69,11 @@ if uploaded_file:
         st.stop()
 
     df = df.sort_values("Year").reset_index(drop=True)
-
     min_year, max_year = df["Year"].min(), df["Year"].max()
 
-    # -------------------------------------------------
+    # =================================================
     # STRIPES & BARS
-    # -------------------------------------------------
+    # =================================================
     if plot_type in ["Stripes", "Bars"]:
 
         param_columns = [col for col in df.columns if col != "Year"]
@@ -106,6 +105,8 @@ if uploaded_file:
                     color=cmap(norm(row["Anomaly"]))
                 )
 
+            ax.set_xlim(0, len(df))
+            ax.set_ylim(0, 1)
             ax.set_axis_off()
 
             if show_years:
@@ -123,23 +124,25 @@ if uploaded_file:
                 ax.set_xticks(df["Year"][::year_step])
                 ax.set_xticklabels(df["Year"][::year_step], rotation=90)
 
-            ax.axhline(0, color="black")
+            ax.axhline(0, color="black", linewidth=1)
 
             if add_trendline:
                 z = np.polyfit(df["Year"], df["Anomaly"], 1)
                 p = np.poly1d(z)
-                ax.plot(df["Year"], p(df["Year"]), color="black", linewidth=2)
+                ax.plot(df["Year"], p(df["Year"]),
+                        color="black", linewidth=2)
 
         sm = ScalarMappable(norm=norm, cmap=cmap)
-        fig.colorbar(sm, ax=ax)
+        fig.colorbar(sm, ax=ax, label="Anomaly")
 
         plt.title(f"{parameter} Anomaly ({min_year}-{max_year})")
         st.pyplot(fig)
 
-    # -------------------------------------------------
-    # MOSAIC
-    # -------------------------------------------------
-    elif plot_type in ["Mosaic", "Interactive Mosaic", "Seasonal Mosaic"]:
+
+    # =================================================
+    # MOSAIC & SEASONAL MOSAIC
+    # =================================================
+    elif plot_type in ["Mosaic", "Seasonal Mosaic"]:
 
         month_cols = [c for c in df.columns if c != "Year"]
 
@@ -149,7 +152,7 @@ if uploaded_file:
 
         data_matrix = df[month_cols].values
 
-        # Monthly climatology anomaly
+        # Monthly climatology anomaly (correct approach)
         monthly_mean = np.nanmean(data_matrix, axis=0)
         anomaly = data_matrix - monthly_mean
 
@@ -179,69 +182,52 @@ if uploaded_file:
         if set_color_range:
             vmin, vmax = color_min, color_max
 
-        if plot_type == "Interactive Mosaic":
+        norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        cmap = plt.get_cmap(colormap)
 
-            fig = px.imshow(
-                anomaly.T,
-                labels=dict(x="Year", y="Month/Season", color="Anomaly"),
-                x=df["Year"],
-                y=month_cols,
-                color_continuous_scale=colormap,
-                zmin=vmin,
-                zmax=vmax,
-                aspect="auto"
-            )
+        fig, ax = plt.subplots(figsize=(15,6))
 
-            st.plotly_chart(fig, use_container_width=True)
-
-        else:
-
-            norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
-            cmap = plt.get_cmap(colormap)
-
-            fig, ax = plt.subplots(figsize=(15,6))
-            im = ax.imshow(
-                anomaly.T,
-                aspect="auto",
-                cmap=cmap,
-                norm=norm,
-                origin="lower"
-            )
-
-            # Grid style
-            ax.set_xticks(np.arange(-.5, len(df), 1), minor=True)
-            ax.set_yticks(np.arange(-.5, len(month_cols), 1), minor=True)
-            ax.grid(which="minor", color="white", linewidth=0.5)
-            ax.tick_params(which="minor", bottom=False, left=False)
-
-            if show_years:
-                ax.set_xticks(np.arange(0,len(df),year_step))
-                ax.set_xticklabels(df["Year"][::year_step], rotation=90)
-            else:
-                ax.set_xticklabels([])
-
-            ax.set_yticks(np.arange(len(month_cols)))
-            ax.set_yticklabels(month_cols)
-
-            fig.colorbar(im, ax=ax)
-
-            plt.title(f"Mosaic Anomaly ({min_year}-{max_year})")
-
-            st.pyplot(fig)
-
-    # -------------------------------------------------
-    # EXPORT
-    # -------------------------------------------------
-    if plot_type != "Interactive Mosaic":
-        buf = io.BytesIO()
-        plt.savefig(buf, format=file_format.lower(), dpi=dpi, bbox_inches='tight')
-        buf.seek(0)
-
-        st.download_button(
-            f"Download {file_format}",
-            buf,
-            file_name=f"climate_plot.{file_format.lower()}"
+        im = ax.imshow(
+            anomaly.T,
+            aspect="auto",
+            cmap=cmap,
+            norm=norm,
+            origin="lower"
         )
+
+        # Grid style (journal quality)
+        ax.set_xticks(np.arange(-.5, len(df), 1), minor=True)
+        ax.set_yticks(np.arange(-.5, len(month_cols), 1), minor=True)
+        ax.grid(which="minor", color="white", linewidth=0.5)
+        ax.tick_params(which="minor", bottom=False, left=False)
+
+        if show_years:
+            ax.set_xticks(np.arange(0,len(df),year_step))
+            ax.set_xticklabels(df["Year"][::year_step], rotation=90)
+        else:
+            ax.set_xticklabels([])
+
+        ax.set_yticks(np.arange(len(month_cols)))
+        ax.set_yticklabels(month_cols)
+
+        fig.colorbar(im, ax=ax, label="Anomaly")
+
+        plt.title(f"{plot_type} ({min_year}-{max_year})")
+        st.pyplot(fig)
+
+
+    # =================================================
+    # EXPORT
+    # =================================================
+    buf = io.BytesIO()
+    plt.savefig(buf, format=file_format.lower(), dpi=dpi, bbox_inches='tight')
+    buf.seek(0)
+
+    st.download_button(
+        f"Download {file_format}",
+        buf,
+        file_name=f"climate_plot.{file_format.lower()}"
+    )
 
 else:
     st.info("Upload a CSV file to begin.")
