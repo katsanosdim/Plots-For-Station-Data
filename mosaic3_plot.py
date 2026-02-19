@@ -209,13 +209,13 @@ if uploaded_file:
             ax.set_xticklabels(
                 df["Year"][::year_step],
                 rotation=90,
-                fontsize=14
+                fontsize=18
             )
         else:
             ax.set_xticklabels([])
 
         ax.set_yticks(np.arange(len(month_cols)))
-        ax.set_yticklabels(month_cols, fontsize=16)
+        ax.set_yticklabels(month_cols, fontsize=20)
 
         ax.set_xlabel("Year", fontsize=16)
         ax.set_ylabel("Month / Season", fontsize=16)
@@ -224,7 +224,7 @@ if uploaded_file:
         cbar.set_label("Anomaly", fontsize=14)
         cbar.ax.tick_params(labelsize=12)
 
-        plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=20)
+        plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=24)
 
         st.pyplot(fig)
 
