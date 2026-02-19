@@ -11,7 +11,6 @@ import io
 # -------------------------------------------------
 st.set_page_config(page_title="Climate Plots", page_icon="🌍", layout="wide")
 st.title("🌍 Climate Visualisation App")
-st.markdown("Stripes • Bars • Mosaic • Seasonal")
 
 # -------------------------------------------------
 # SIDEBAR
@@ -31,6 +30,9 @@ with st.sidebar:
         ["Stripes", "Bars", "Mosaic", "Seasonal Mosaic"]
     )
 
+    st.header("Title")
+    custom_title = st.text_input("Custom Title", value="Climate Anomaly")
+
     st.header("Color Settings")
     colormap = st.selectbox(
         "Colormap",
@@ -44,6 +46,9 @@ with st.sidebar:
     if set_color_range:
         color_min = st.number_input("Min", value=-2.0)
         color_max = st.number_input("Max", value=2.0)
+
+    st.header("Month Order (Mosaic only)")
+    month_position = st.radio("Top Month", ["January", "December"])
 
     st.header("Labels")
     show_years = st.checkbox("Show Year Labels", True)
@@ -100,31 +105,15 @@ if uploaded_file:
         if plot_type == "Stripes":
 
             for i, row in df.iterrows():
-                ax.fill_between(
-                    [i, i+1], 0, 1,
-                    color=cmap(norm(row["Anomaly"]))
-                )
+                ax.fill_between([i, i+1], 0, 1,
+                                color=cmap(norm(row["Anomaly"])))
 
-            ax.set_xlim(0, len(df))
-            ax.set_ylim(0, 1)
             ax.set_axis_off()
-
-            if show_years:
-                for i, year in enumerate(df["Year"]):
-                    if year % year_step == 0:
-                        ax.text(i+0.5, -0.05, str(year),
-                                rotation=90, ha='center')
 
         elif plot_type == "Bars":
 
             colors = cmap(norm(df["Anomaly"]))
             ax.bar(df["Year"], df["Anomaly"], color=colors)
-
-            if show_years:
-                ax.set_xticks(df["Year"][::year_step])
-                ax.set_xticklabels(df["Year"][::year_step], rotation=90)
-
-            ax.axhline(0, color="black", linewidth=1)
 
             if add_trendline:
                 z = np.polyfit(df["Year"], df["Anomaly"], 1)
@@ -132,15 +121,17 @@ if uploaded_file:
                 ax.plot(df["Year"], p(df["Year"]),
                         color="black", linewidth=2)
 
+            ax.axhline(0, color="black", linewidth=1)
+
         sm = ScalarMappable(norm=norm, cmap=cmap)
         fig.colorbar(sm, ax=ax, label="Anomaly")
 
-        plt.title(f"{parameter} Anomaly ({min_year}-{max_year})")
+        plt.title(f"{custom_title} ({min_year}-{max_year})")
         st.pyplot(fig)
 
 
     # =================================================
-    # MOSAIC & SEASONAL MOSAIC
+    # MOSAIC & SEASONAL
     # =================================================
     elif plot_type in ["Mosaic", "Seasonal Mosaic"]:
 
@@ -152,7 +143,7 @@ if uploaded_file:
 
         data_matrix = df[month_cols].values
 
-        # Monthly climatology anomaly (correct approach)
+        # Monthly climatology anomaly
         monthly_mean = np.nanmean(data_matrix, axis=0)
         anomaly = data_matrix - monthly_mean
 
@@ -172,6 +163,15 @@ if uploaded_file:
             anomaly = np.array(seasonal_matrix).T
             month_cols = list(seasons.keys())
 
+        # Reverse month order if January on top
+        if month_position == "January":
+            anomaly = anomaly
+            origin_setting = "upper"
+        else:
+            anomaly = anomaly[:, ::-1]
+            month_cols = month_cols[::-1]
+            origin_setting = "upper"
+
         vmin = np.nanmin(anomaly)
         vmax = np.nanmax(anomaly)
 
@@ -185,20 +185,23 @@ if uploaded_file:
         norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
         cmap = plt.get_cmap(colormap)
 
-        fig, ax = plt.subplots(figsize=(15,6))
+        # Rectangular cells
+        fig_height = 8
+        fig_width = len(df) * 0.4
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
         im = ax.imshow(
             anomaly.T,
             aspect="auto",
             cmap=cmap,
             norm=norm,
-            origin="lower"
+            origin=origin_setting
         )
 
-        # Grid style (journal quality)
+        # Gridlines
         ax.set_xticks(np.arange(-.5, len(df), 1), minor=True)
         ax.set_yticks(np.arange(-.5, len(month_cols), 1), minor=True)
-        ax.grid(which="minor", color="white", linewidth=0.5)
+        ax.grid(which="minor", color="white", linewidth=0.6)
         ax.tick_params(which="minor", bottom=False, left=False)
 
         if show_years:
@@ -212,7 +215,7 @@ if uploaded_file:
 
         fig.colorbar(im, ax=ax, label="Anomaly")
 
-        plt.title(f"{plot_type} ({min_year}-{max_year})")
+        plt.title(f"{custom_title} ({min_year}-{max_year})")
         st.pyplot(fig)
 
 
