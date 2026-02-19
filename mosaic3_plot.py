@@ -217,8 +217,8 @@ if uploaded_file:
         ax.set_yticks(np.arange(len(month_cols)))
         ax.set_yticklabels(month_cols, fontsize=20)
 
-        ax.set_xlabel("Year", fontsize=16)
-        ax.set_ylabel("Month / Season", fontsize=16)
+        #ax.set_xlabel("Year", fontsize=16)
+        #ax.set_ylabel("Month / Season", fontsize=16)
 
         cbar = fig.colorbar(im, ax=ax)
         cbar.set_label("Anomaly", fontsize=14)
