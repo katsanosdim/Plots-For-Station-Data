@@ -131,108 +131,102 @@ if uploaded_file:
 
 
     # =================================================
-    # MOSAIC & SEASONAL
+    # MOSAIC & SEASONAL MOSAIC
     # =================================================
     elif plot_type in ["Mosaic", "Seasonal Mosaic"]:
 
-    month_cols = [c for c in df.columns if c != "Year"]
+        month_cols = [c for c in df.columns if c != "Year"]
 
-    if len(month_cols) != 12:
-        st.error("Need 12 monthly columns (Jan–Dec)")
-        st.stop()
+        if len(month_cols) != 12:
+            st.error("Need 12 monthly columns (Jan–Dec)")
+            st.stop()
 
-    data_matrix = df[month_cols].values
+        data_matrix = df[month_cols].values
 
-    # Monthly climatology anomaly
-    monthly_mean = np.nanmean(data_matrix, axis=0)
-    anomaly = data_matrix - monthly_mean
+        # Monthly climatology anomaly
+        monthly_mean = np.nanmean(data_matrix, axis=0)
+        anomaly = data_matrix - monthly_mean
 
-    if plot_type == "Seasonal Mosaic":
+        if plot_type == "Seasonal Mosaic":
 
-        seasons = {
-            "DJF": [11,0,1],
-            "MAM": [2,3,4],
-            "JJA": [5,6,7],
-            "SON": [8,9,10]
-        }
+            seasons = {
+                "DJF": [11,0,1],
+                "MAM": [2,3,4],
+                "JJA": [5,6,7],
+                "SON": [8,9,10]
+            }
 
-        seasonal_matrix = []
-        for s in seasons.values():
-            seasonal_matrix.append(np.nanmean(anomaly[:, s], axis=1))
+            seasonal_matrix = []
+            for s in seasons.values():
+                seasonal_matrix.append(np.nanmean(anomaly[:, s], axis=1))
 
-        anomaly = np.array(seasonal_matrix).T
-        month_cols = list(seasons.keys())
+            anomaly = np.array(seasonal_matrix).T
+            month_cols = list(seasons.keys())
 
-    # Month order control
-    if month_position == "January":
-        origin_setting = "upper"
-    else:
-        anomaly = anomaly[:, ::-1]
-        month_cols = month_cols[::-1]
-        origin_setting = "upper"
+        # Month order control
+        if month_position == "January":
+            origin_setting = "upper"
+        else:
+            anomaly = anomaly[:, ::-1]
+            month_cols = month_cols[::-1]
+            origin_setting = "upper"
 
-    vmin = np.nanmin(anomaly)
-    vmax = np.nanmax(anomaly)
+        vmin = np.nanmin(anomaly)
+        vmax = np.nanmax(anomaly)
 
-    if auto_center:
-        max_abs = max(abs(vmin), abs(vmax))
-        vmin, vmax = -max_abs, max_abs
+        if auto_center:
+            max_abs = max(abs(vmin), abs(vmax))
+            vmin, vmax = -max_abs, max_abs
 
-    if set_color_range:
-        vmin, vmax = color_min, color_max
+        if set_color_range:
+            vmin, vmax = color_min, color_max
 
-    norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
-    cmap = plt.get_cmap(colormap)
+        norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        cmap = plt.get_cmap(colormap)
 
-    # ---- IMPROVED FIGURE SIZE ----
-    n_years = len(df)
-    fig_width = max(12, n_years * 0.35)
-    fig_height = 8
+        n_years = len(df)
+        fig_width = max(12, n_years * 0.35)
+        fig_height = 8
 
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
-    im = ax.imshow(
-        anomaly.T,
-        cmap=cmap,
-        norm=norm,
-        origin=origin_setting,
-        aspect="auto"
-    )
-
-    # ---- GRID ----
-    ax.set_xticks(np.arange(-.5, n_years, 1), minor=True)
-    ax.set_yticks(np.arange(-.5, len(month_cols), 1), minor=True)
-    ax.grid(which="minor", color="white", linewidth=0.6)
-    ax.tick_params(which="minor", bottom=False, left=False)
-
-    # ---- LARGER AXIS LABELS ----
-    if show_years:
-        ax.set_xticks(np.arange(0, n_years, year_step))
-        ax.set_xticklabels(
-            df["Year"][::year_step],
-            rotation=90,
-            fontsize=12
+        im = ax.imshow(
+            anomaly.T,
+            cmap=cmap,
+            norm=norm,
+            origin=origin_setting,
+            aspect="auto"
         )
-    else:
-        ax.set_xticklabels([])
 
-    ax.set_yticks(np.arange(len(month_cols)))
-    ax.set_yticklabels(
-        month_cols,
-        fontsize=14
-    )
+        # Grid
+        ax.set_xticks(np.arange(-.5, n_years, 1), minor=True)
+        ax.set_yticks(np.arange(-.5, len(month_cols), 1), minor=True)
+        ax.grid(which="minor", color="white", linewidth=0.6)
+        ax.tick_params(which="minor", bottom=False, left=False)
 
-    ax.set_xlabel("Year", fontsize=16)
-    ax.set_ylabel("Month / Season", fontsize=16)
+        if show_years:
+            ax.set_xticks(np.arange(0, n_years, year_step))
+            ax.set_xticklabels(
+                df["Year"][::year_step],
+                rotation=90,
+                fontsize=12
+            )
+        else:
+            ax.set_xticklabels([])
 
-    # ---- COLORBAR ----
-    cbar = fig.colorbar(im, ax=ax)
-    cbar.set_label("Anomaly", fontsize=14)
-    cbar.ax.tick_params(labelsize=12)
+        ax.set_yticks(np.arange(len(month_cols)))
+        ax.set_yticklabels(month_cols, fontsize=14)
 
-    plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=18)
+        ax.set_xlabel("Year", fontsize=16)
+        ax.set_ylabel("Month / Season", fontsize=16)
 
-    st.pyplot(fig)
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label("Anomaly", fontsize=14)
+        cbar.ax.tick_params(labelsize=12)
+
+        plt.title(f"{custom_title} ({min_year}-{max_year})", fontsize=18)
+
+        st.pyplot(fig)
 
 
     # =================================================
