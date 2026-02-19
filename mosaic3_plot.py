@@ -11,7 +11,7 @@ import io
 # -------------------------------------------------
 st.set_page_config(page_title="Climate Plots", page_icon="🌍", layout="wide")
 st.title("🌍 Climate Visualisation App")
-
+st.markdown("Make climate summary plots for NOA´s Thiseio Station. Created by **Dimitris Katsanos**")
 # -------------------------------------------------
 # SIDEBAR
 # -------------------------------------------------
