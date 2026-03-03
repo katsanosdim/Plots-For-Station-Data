@@ -42,7 +42,7 @@ with st.sidebar:
         "Select Colormap",
         [
             "RdBu_r", "coolwarm", "seismic", "BrBG",
-            "Spectral_r", "PuOr", "PRGn",
+            "Spectral_r", "PuOr_r", "PRGn",
             "viridis", "plasma", "cividis",
             "turbo", "magma"
         ],
