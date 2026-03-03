@@ -148,7 +148,7 @@ if uploaded_file:
     n_years = len(df_plot)
     fig_width = max(12, n_years * 0.35)
 
-    fig, ax = plt.subplots(figsize=(fig_width, 8))
+    fig, ax = plt.subplots(figsize=(fig_width, 4))
 
     im = ax.imshow(
         anomaly.T,
