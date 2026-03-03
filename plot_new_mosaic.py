@@ -9,8 +9,8 @@ import io
 # PAGE CONFIG
 # -------------------------------------------------
 st.set_page_config(page_title="Climate Mosaic", page_icon="🌍", layout="wide")
-st.title("🌍 Climate Mosaic Visualisation")
-st.markdown("Anomalies relative to 1991–2020 climatology")
+st.title("🌍 Temperature Heatmap Visualisation")
+st.markdown("Anomalies relative to 1991–2020 climatology - Created by Dimitris Katsanos (NOA/IERSD")
 
 REFERENCE_START = 1991
 REFERENCE_END   = 2020
