@@ -182,7 +182,7 @@ if uploaded_file:
     ax.set_yticks(np.arange(len(month_cols)))
     ax.set_yticklabels(month_cols)
 
-    title = f"{custom_title} ({plot_start}–{plot_end})\nRelative to 1991–2020"
+    title = f"{custom_title} ({plot_start}–{plot_end})\nReference Period: 1991–2020"
     plt.title(title, fontsize=18)
     #title = f"Anomalies relative to 1991–2020 ({plot_start}–{plot_end})"
     #plt.title(title, fontsize=18)
