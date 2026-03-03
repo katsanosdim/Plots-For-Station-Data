@@ -10,7 +10,10 @@ import io
 # -------------------------------------------------
 st.set_page_config(page_title="Climate Mosaic", page_icon="🌍", layout="wide")
 st.title("🌍 Climate Mosaic Visualisation")
-st.markdown("Monthly & Seasonal anomaly heatmaps for NOA Thiseio Station")
+st.markdown("Anomalies relative to 1991–2020 climatology")
+
+REFERENCE_START = 1991
+REFERENCE_END   = 2020
 
 # -------------------------------------------------
 # SIDEBAR
@@ -30,9 +33,9 @@ with st.sidebar:
         ["Mosaic", "Seasonal Mosaic"]
     )
 
-    st.header("Reference Period")
-    ref_start = st.number_input("Reference Start", value=1991)
-    ref_end   = st.number_input("Reference End", value=2020)
+    st.header("Plot Period (adjustable)")
+    plot_start = st.number_input("Start Year", value=2000)
+    plot_end   = st.number_input("End Year", value=2023)
 
     st.header("Colormap")
     colormap = st.selectbox(
@@ -47,9 +50,6 @@ with st.sidebar:
     )
 
     auto_center = st.checkbox("Auto center at zero", True)
-
-    st.header("Year Range to Plot")
-    year_range = st.slider("Select Years", 1950, 2025, (1990, 2023))
 
     st.header("Display Options")
     show_years = st.checkbox("Show Year Labels", True)
@@ -68,30 +68,10 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
 
     if "Year" not in df.columns:
-        st.error("CSV must contain 'Year' column")
+        st.error("CSV must contain 'Year' column.")
         st.stop()
 
     df = df.sort_values("Year").reset_index(drop=True)
-
-    # ----------------------------------------------
-    # Select year range for plotting
-    # ----------------------------------------------
-    df_plot = df[
-        (df["Year"] >= year_range[0]) &
-        (df["Year"] <= year_range[1])
-    ].copy()
-
-    # ----------------------------------------------
-    # Reference period selection
-    # ----------------------------------------------
-    df_ref = df[
-        (df["Year"] >= ref_start) &
-        (df["Year"] <= ref_end)
-    ]
-
-    if df_ref.empty:
-        st.error("Reference period not found in dataset.")
-        st.stop()
 
     month_cols = [c for c in df.columns if c != "Year"]
 
@@ -99,17 +79,38 @@ if uploaded_file:
         st.error("Need exactly 12 monthly columns.")
         st.stop()
 
-    # ----------------------------------------------
-    # Compute anomalies using reference climatology
-    # ----------------------------------------------
-    ref_mean = df_ref[month_cols].mean()
-    anomaly = df_plot[month_cols] - ref_mean
+    # -------------------------------------------------
+    # FIXED REFERENCE PERIOD (1991–2020)
+    # -------------------------------------------------
+    df_ref = df[
+        (df["Year"] >= REFERENCE_START) &
+        (df["Year"] <= REFERENCE_END)
+    ]
 
+    if df_ref.empty:
+        st.error("Reference period 1991–2020 not found in dataset.")
+        st.stop()
+
+    ref_mean = df_ref[month_cols].mean()
+
+    # -------------------------------------------------
+    # USER-SELECTED PLOT PERIOD
+    # -------------------------------------------------
+    df_plot = df[
+        (df["Year"] >= plot_start) &
+        (df["Year"] <= plot_end)
+    ].copy()
+
+    if df_plot.empty:
+        st.error("Selected plot period not found in dataset.")
+        st.stop()
+
+    anomaly = df_plot[month_cols] - ref_mean
     anomaly = anomaly.values
 
-    # ----------------------------------------------
-    # Seasonal option
-    # ----------------------------------------------
+    # -------------------------------------------------
+    # SEASONAL OPTION
+    # -------------------------------------------------
     if plot_type == "Seasonal Mosaic":
 
         seasons = {
@@ -128,9 +129,9 @@ if uploaded_file:
         anomaly = np.array(seasonal_matrix).T
         month_cols = list(seasons.keys())
 
-    # ----------------------------------------------
-    # Color scaling
-    # ----------------------------------------------
+    # -------------------------------------------------
+    # COLOR SCALING
+    # -------------------------------------------------
     vmin = np.nanmin(anomaly)
     vmax = np.nanmax(anomaly)
 
@@ -141,9 +142,9 @@ if uploaded_file:
     norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
     cmap = plt.get_cmap(colormap)
 
-    # ----------------------------------------------
-    # Plot
-    # ----------------------------------------------
+    # -------------------------------------------------
+    # PLOT
+    # -------------------------------------------------
     n_years = len(df_plot)
     fig_width = max(12, n_years * 0.35)
 
@@ -176,7 +177,7 @@ if uploaded_file:
     ax.set_yticks(np.arange(len(month_cols)))
     ax.set_yticklabels(month_cols)
 
-    title = f"Anomalies relative to {ref_start}-{ref_end}"
+    title = f"Anomalies relative to 1991–2020 ({plot_start}–{plot_end})"
     plt.title(title, fontsize=18)
 
     cbar = fig.colorbar(im, ax=ax)
@@ -184,9 +185,9 @@ if uploaded_file:
 
     st.pyplot(fig)
 
-    # ----------------------------------------------
-    # Export
-    # ----------------------------------------------
+    # -------------------------------------------------
+    # EXPORT
+    # -------------------------------------------------
     buf = io.BytesIO()
     fig.savefig(buf, format=file_format.lower(), dpi=dpi, bbox_inches="tight")
     buf.seek(0)
@@ -194,7 +195,7 @@ if uploaded_file:
     st.download_button(
         f"Download {file_format}",
         buf,
-        file_name=f"mosaic_{year_range[0]}_{year_range[1]}.{file_format.lower()}"
+        file_name=f"mosaic_{plot_start}_{plot_end}.{file_format.lower()}"
     )
 
 else:
