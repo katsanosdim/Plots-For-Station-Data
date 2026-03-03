@@ -32,7 +32,12 @@ with st.sidebar:
         "Choose Plot",
         ["Mosaic", "Seasonal Mosaic"]
     )
-
+    st.header("Title")
+    custom_title = st.text_input(
+    "Plot Title",
+    value="Climate Anomalies"
+    )
+    
     st.header("Plot Period (adjustable)")
     plot_start = st.number_input("Start Year", value=2000)
     plot_end   = st.number_input("End Year", value=2023)
@@ -177,8 +182,10 @@ if uploaded_file:
     ax.set_yticks(np.arange(len(month_cols)))
     ax.set_yticklabels(month_cols)
 
-    title = f"Anomalies relative to 1991–2020 ({plot_start}–{plot_end})"
+    title = f"{custom_title}\nRelative to 1991–2020 ({plot_start}–{plot_end})"
     plt.title(title, fontsize=18)
+    #title = f"Anomalies relative to 1991–2020 ({plot_start}–{plot_end})"
+    #plt.title(title, fontsize=18)
 
     cbar = fig.colorbar(im, ax=ax)
     cbar.set_label("Anomaly")
