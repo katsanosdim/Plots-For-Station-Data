@@ -43,7 +43,7 @@ with st.sidebar:
         [
             "RdBu_r", "coolwarm", "seismic", "BrBG",
             "Spectral_r", "PuOr_r", "PRGn",
-            "viridis", "plasma", "cividis",
+            "RdYlBu_r", "plasma", "cividis",
             "turbo", "magma"
         ],
         index=0
